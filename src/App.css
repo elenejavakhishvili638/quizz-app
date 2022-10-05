@@ -6,6 +6,30 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* align-content: center; */
   align-items: center;
+  min-height: 100vh;
+}
+
+.start {
+  background-color: #f96666;
+  border: none;
+  padding: 5px 5rem;
+  border-radius: 8px;
+  font-size: large;
+  font-weight: 300;
+}
+
+.next-question {
+  border-color: #a97f7f;
+  border-radius: 8px;
+  background-color: transparent;
+  cursor: pointer;
+  margin-top: 50px;
+  font-size: 1rem;
+  padding: 3px 10px;
+}
+
+.score {
+  font-weight: 700;
+  font-size: 1.2rem;
 }

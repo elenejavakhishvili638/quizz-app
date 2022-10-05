@@ -3,16 +3,18 @@ import "./Questions.css"
 import {Props} from "./interfaces/propsInterface"
 import {decodeHtml} from "./utils"
 
-const Questions: React.FC<Props> = ({question, answers, callback, show, manageClassName, questionNr, totalQuestions}) => {
+const Questions: React.FC<Props> = ({question, answers, callback, show, manageClassName, questionNr, totalQuestions, userAnswer}) => {
   
   
   return (
-    <div>
-      <p>{`Question: ${questionNr}/${totalQuestions}`}</p>
-      <p>{decodeHtml(question)}</p>
+    <div className='questions-content'>
+      <p className='question-number'>{`Question: ${questionNr}/${totalQuestions}`}</p>
+      <p className='question'>{decodeHtml(question)}</p>
+      <div className='btn-container'>
       {answers && answers.map((answer, index) => (
-        <button key={index} value={answer} onClick={() => callback(answer)} className={`default ${show && manageClassName(answer)}`} >{decodeHtml(answer)}</button>
-      ))}
+          <button key={index} value={answer} disabled={userAnswer ? true : false} onClick={() => callback(answer)} className={`default ${show && manageClassName(answer)}`} >{decodeHtml(answer)}</button>
+          ))}
+          </div>
     </div>
   )
 }

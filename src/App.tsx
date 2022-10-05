@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import './App.css';
 import Loading from './components/Loading';
 import {shuffleArray} from "./components/utils"
-// import "./components/Questions.css"
 import Questions from "./components/Questions"
 import {Data, QuestionState, UserAnswer} from "./components/interfaces/dataInterface"
 
@@ -59,11 +58,18 @@ const App: React.FC = () => {
 
   const manageClassName = (userAnswer: string) => {
     if(data[questionNr].correct_answer === userAnswer) {
-      console.log("correct");
+      // console.log("correct");
       return "correct";
-    } else if (userAnswers[questionNr] && userAnswers[questionNr].answer === userAnswer) {
-      return "wrong"
+    } else {
+
+      for (let i = 0; i<userAnswers.length; i++) {
+        if (userAnswers[i] && userAnswers[i].answer === userAnswer) {
+          console.log(userAnswers[i])
+          return "wrong"
+        }
+      }
     }
+   
 
     return "";
   }
@@ -71,35 +77,43 @@ const App: React.FC = () => {
   
 
   return (
-    <div className='main'>
+    <div className='main'> 
       <h1>Quiz</h1>
-      {gameOver || userAnswers.length === data.length ? (
-              <button onClick={startGame}>Start</button>
+      {/* || userAnswers.length === data.length */}
+      {gameOver  ? (
+              <button className='start' onClick={startGame}>Start</button>
       ) : null}
-      {!gameOver && <p>{`Score: ${score}`}</p>}
+      {!gameOver && <p className='score'>{`Score: ${score}`}</p>}
       {loading && <Loading />}
       {data.length > 1 && (
-         <div>
-      <Questions 
-        question={data[questionNr] && data[questionNr].question}
-        answers={data[questionNr] && data[questionNr].answers}
-        callback={checkAnswer}
-        show={show}
-        manageClassName={manageClassName}
-        questionNr={questionNr + 1}
-        totalQuestions={data.length}
-      />
+         <div className='questions-container'>
+          <Questions 
+            question={data[questionNr] && data[questionNr].question}
+            answers={data[questionNr] && data[questionNr].answers}
+            callback={checkAnswer}
+            show={show}
+            manageClassName={manageClassName}
+            questionNr={questionNr + 1}
+            totalQuestions={data.length}
+            userAnswer={userAnswers ? userAnswers[questionNr] : undefined}
+          />
        </div>
       )}
 
      
-      {!gameOver && !loading &&  (questionNr < data.length - 1 ? <button onClick={() => {
-        setQuestionNr((prevValue) => prevValue + 1)
-        setShow(false)
-        }}>Next question</button> : <button onClick={startGame}>start over</button>)}
+      {!gameOver && !loading &&  (questionNr < data.length - 1 ? <button className='next-question' onClick={() => {
+        if(show) {
+
+          setQuestionNr((prevValue) => prevValue + 1)
+          setShow(false)
+        } else {
+          return 
+        }
+        }}>Next question</button> : <button className='start-over' onClick={() => {window.location.reload();}}>start over</button>)}
       
     </div>
   )
 }
+
 
 export default App
