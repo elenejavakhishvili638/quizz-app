@@ -2,7 +2,8 @@ export interface Props {
     question: string
     answers: string[]
     callback: any
-    userAnswer: any
+    show: boolean
+    manageClassName: any
     questionNr: number
     totalQuestions: number
 }

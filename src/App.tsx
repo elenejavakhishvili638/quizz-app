@@ -1,26 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import Loading from './components/Loading';
-import Questions from './components/Questions';
 import {shuffleArray} from "./components/utils"
-
-interface Data {
-  category: string
-  correct_answer: string
-  difficulty: string
-  incorrect_answers: string[]
-  question: string
-  type: string
-}
-
-type QuestionState = Data & {answers: string[]}
-
-interface UserAnswer {
-  question: string
-  answer: string
-  isCorrect: boolean
-  correctAnswer: string
-}
+// import "./components/Questions.css"
+import Questions from "./components/Questions"
+import {Data, QuestionState, UserAnswer} from "./components/interfaces/dataInterface"
 
 const App: React.FC = () => {
 
@@ -29,9 +13,9 @@ const App: React.FC = () => {
   const [questionNr, setQuestionNr] = useState<number>(0)
   const [score, setScore] = useState<number>(0)
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([])
-  // const [questions, setQuestions] = useState([])
   const [gameOver, setGameOver] = useState(true)
-  const [start, setStart] = useState(false)
+  const [show, setShow] = useState(false);
+
 
   const fetchQuestions = () => {
     setLoading(true)
@@ -39,29 +23,52 @@ const App: React.FC = () => {
       setData(data.results.map((question: Data) => (
         {...question, answers: shuffleArray([...question.incorrect_answers, question.correct_answer])}
       )))
-      // setData(data.results)
       setLoading(false)
     })
   }
 
-  // useEffect(() => {
-  //   fetchQuestions()
-  // },[])
 
-  console.log(data)
-
-  // const {question} = data[questionNr]
 
   const startGame = () => {
     fetchQuestions()
-                setStart(true)
-                setGameOver(false)
-                setScore(0)
-                setQuestionNr(0)
+    setGameOver(false)
+    setScore(0)
+    setQuestionNr(0)
   }
 
-  const checkAnswer = () => {}
+  const checkAnswer = (userAnswer: string) => {
+    setShow(true)
+    const correctAnswer = data[questionNr].correct_answer === userAnswer
+    if (correctAnswer) {
+      setScore((prevValue) => prevValue + 1)
+      
+    } 
 
+    let holdAnswers = userAnswers.filter((item) => item.answer !== userAnswer)
+
+    const answer = {
+      question: data[questionNr].question,
+      answer: userAnswer,
+      isCorrect: correctAnswer,
+      correctAnswer: data[questionNr].correct_answer
+    }
+    setUserAnswers([...holdAnswers, answer])
+  }
+
+
+
+  const manageClassName = (userAnswer: string) => {
+    if(data[questionNr].correct_answer === userAnswer) {
+      console.log("correct");
+      return "correct";
+    } else if (userAnswers[questionNr] && userAnswers[questionNr].answer === userAnswer) {
+      return "wrong"
+    }
+
+    return "";
+  }
+
+  
 
   return (
     <div className='main'>
@@ -69,50 +76,27 @@ const App: React.FC = () => {
       {gameOver || userAnswers.length === data.length ? (
               <button onClick={startGame}>Start</button>
       ) : null}
-      {!gameOver && <p>Score:</p>}
+      {!gameOver && <p>{`Score: ${score}`}</p>}
       {loading && <Loading />}
       {data.length > 1 && (
-        <Questions 
-        questionNr={questionNr + 1}
+         <div>
+      <Questions 
         question={data[questionNr] && data[questionNr].question}
         answers={data[questionNr] && data[questionNr].answers}
-        totalQuestions={data.length}
-        userAnswer={userAnswers ? userAnswers[questionNr] : undefined}
         callback={checkAnswer}
+        show={show}
+        manageClassName={manageClassName}
+        questionNr={questionNr + 1}
+        totalQuestions={data.length}
       />
+       </div>
       )}
 
-      {/* {loading ? <Loading /> : (
-        <div>
-          <p>Score:</p>
-          <Questions 
-          questionNr={questionNr + 1}
-          question={data[questionNr] && data[questionNr].question}
-          answers={data[questionNr] && data[questionNr].answers}
-          totalQuestions={data.length}
-          userAnswer={userAnswers ? userAnswers[questionNr] : undefined}
-          callback={checkAnswer}
-        />
-        </div>
-      )} */}
-
-      {/* {start ? 
-      (
-      <div>
-        <p>Score:</p>
-        {loading ? <Loading /> : <Questions 
-          questionNr={questionNr + 1}
-          question={data[questionNr] && data[questionNr].question}
-          answers={data[questionNr] && data[questionNr].answers}
-          totalQuestions={data.length}
-          userAnswer={userAnswers ? userAnswers[questionNr] : undefined}
-          callback={checkAnswer}
-        />}
-        
-        <button onClick={() => setQuestionNr((prevValue) => prevValue + 1)}>Next question</button>
-      </div>) : null
-    } */}
-      {!gameOver && !loading &&  (questionNr < data.length - 1 ?<button onClick={() => setQuestionNr((prevValue) => prevValue + 1)}>Next question</button> : <button onClick={startGame}>start over</button>)}
+     
+      {!gameOver && !loading &&  (questionNr < data.length - 1 ? <button onClick={() => {
+        setQuestionNr((prevValue) => prevValue + 1)
+        setShow(false)
+        }}>Next question</button> : <button onClick={startGame}>start over</button>)}
       
     </div>
   )
